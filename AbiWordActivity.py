@@ -19,7 +19,7 @@
 from gettext import gettext as _
 import logging
 import os
-
+print("DEV WRITE ACTIVITY RUNNING FROM REPO")
 from gi.repository import GObject
 
 import gi
