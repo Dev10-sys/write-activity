@@ -56,16 +56,15 @@ class FontComboBox(Gtk.ToolItem):
         self._palette_invoker = ToolInvoker()
         Gtk.ToolItem.__init__(self)
         self._font_label = FontLabel()
-        bt = Gtk.Button('')
+        bt = Gtk.Button()
         bt.set_can_focus(False)
-        bt.remove(bt.get_children()[0])
-        box = Gtk.HBox()
-        bt.add(box)
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        bt.set_child(box)
         icon = Icon(icon_name='font-text')
-        box.pack_start(icon, False, False, 10)
-        box.pack_start(self._font_label, False, False, 10)
-        self.add(bt)
-        self.show_all()
+        box.append(icon)
+        box.append(self._font_label)
+        self.set_child(bt)
+        self.set_visible(True)
 
         self._font_name = 'Sans'
 
@@ -75,7 +74,7 @@ class FontComboBox(Gtk.ToolItem):
         else:
             subcell_size = 11
         radius = 2 * subcell_size
-        theme = b"GtkButton {border-radius: %dpx;}" % radius
+        theme = b"button {border-radius: %dpx;}" % radius
         css_provider = Gtk.CssProvider()
         css_provider.load_from_data(theme)
         style_context = bt.get_style_context()
@@ -121,10 +120,10 @@ class FontComboBox(Gtk.ToolItem):
 
         if os.path.exists(USER_FONTS_FILE_PATH):
             # get the font names in the file to the white list
-            fonts_file = open(USER_FONTS_FILE_PATH)
-            # get the font names in the file to the white list
-            for line in fonts_file:
-                self._font_white_list.append(line.strip())
+            with open(USER_FONTS_FILE_PATH) as fonts_file:
+                # get the font names in the file to the white list
+                for line in fonts_file:
+                    self._font_white_list.append(line.strip())
             # monitor changes in the file
             gio_fonts_file = Gio.File.new_for_path(USER_FONTS_FILE_PATH)
             self.monitor = gio_fonts_file.monitor_file(
@@ -137,13 +136,15 @@ class FontComboBox(Gtk.ToolItem):
             return
         self._font_white_list = []
         self._font_white_list.extend(DEFAULT_FONTS)
-        fonts_file = open(USER_FONTS_FILE_PATH)
-        for line in fonts_file:
-            self._font_white_list.append(line.strip())
+        with open(USER_FONTS_FILE_PATH) as fonts_file:
+            for line in fonts_file:
+                self._font_white_list.append(line.strip())
         # update the menu
-        for child in self._menu_box.get_children():
+        child = self._menu_box.get_first_child()
+        while child:
+            next_child = child.get_next_sibling()
             self._menu_box.remove(child)
-            child = None
+            child = next_child
         context = self.get_pango_context()
         tmp_list = []
         for family in context.list_families():
@@ -221,34 +222,34 @@ class FontSize(Gtk.ToolItem):
             subcell_size = 11
             default_padding = 4
 
-        hbox = Gtk.HBox()
-        vbox = Gtk.VBox()
-        self.add(vbox)
+        hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
+        vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
+        self.set_child(vbox)
         # add a vbox to set the padding up and down
-        vbox.pack_start(hbox, True, True, default_padding)
+        vbox.append(hbox)
         self._size_down = Gtk.Button()
         self._size_down.set_can_focus(False)
         icon = Icon(icon_name='resize-')
-        self._size_down.set_image(icon)
+        self._size_down.set_child(icon)
         self._size_down.connect('clicked', self.__font_sizes_cb, False)
-        hbox.pack_start(self._size_down, False, False, 5)
+        hbox.append(self._size_down)
 
         # TODO: default?
         self._default_size = 12
         self._font_size = self._default_size
 
         self._size_label = Gtk.Label(str(self._font_size))
-        hbox.pack_start(self._size_label, False, False, 10)
+        hbox.append(self._size_label)
 
         self._size_up = Gtk.Button()
         self._size_up.set_can_focus(False)
         icon = Icon(icon_name='resize+')
-        self._size_up.set_image(icon)
+        self._size_up.set_child(icon)
         self._size_up.connect('clicked', self.__font_sizes_cb, True)
-        hbox.pack_start(self._size_up, False, False, 5)
+        hbox.append(self._size_up)
 
         radius = 2 * subcell_size
-        theme_up = b"GtkButton {border-radius:0px %dpx %dpx 0px;}" % (radius,
+        theme_up = b"button {border-radius:0px %dpx %dpx 0px;}" % (radius,
                                                                      radius)
         css_provider_up = Gtk.CssProvider()
         css_provider_up.load_from_data(theme_up)
@@ -257,7 +258,7 @@ class FontSize(Gtk.ToolItem):
         style_context.add_provider(css_provider_up,
                                    Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        theme_down = b"GtkButton {border-radius: %dpx 0px 0px %dpx;}" % (radius,
+        theme_down = b"button {border-radius: %dpx 0px 0px %dpx;}" % (radius,
                                                                         radius)
         css_provider_down = Gtk.CssProvider()
         css_provider_down.load_from_data(theme_down)
@@ -265,7 +266,7 @@ class FontSize(Gtk.ToolItem):
         style_context.add_provider(css_provider_down,
                                    Gtk.STYLE_PROVIDER_PRIORITY_USER)
 
-        self.show_all()
+        self.set_visible(True)
 
     def __font_sizes_cb(self, button, increase):
         if self._font_size in self._font_sizes:

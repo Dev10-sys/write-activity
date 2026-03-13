@@ -25,6 +25,7 @@ except:
     gi.require_version('Abi', '3.0')
 from gi.repository import Abi
 from gi.repository import GLib
+from gi.repository import Graphene
 
 from sugar3.graphics.radiotoolbutton import RadioToolButton
 from sugar3.graphics.toolbutton import ToolButton
@@ -227,36 +228,35 @@ class DocumentView(Abi.Widget):
         self.moveto_right()
         return False
 
-    def __size_allocate_cb(self, widget, allocation):
-        self.set_allocation(allocation)
-
-        if self.get_child() is not None:
-            child_allocation = allocation
-            child_allocation.y = 0
-            child_allocation.x = 0
-            child_allocation.height -= self.dy
-            self.get_child().size_allocate(allocation)
-
+    def __size_allocate_cb(self, widget, width, height):
         if self.osk_changed is True:
             self.moveto_left()
             GLib.timeout_add(100, self.__shallow_move_cb)
             self.osk_changed = False
 
     def __request_clear_area_cb(self, widget, clear, cursor):
-        allocation = widget.get_allocation()
-        allocation.x = 0
-        allocation.y = 0
-        allocation.x, allocation.y = \
-            widget.get_window().get_root_coords(allocation.x, allocation.y)
+        alloc = widget.get_allocation()
+        allocation_x = 0
+        allocation_y = 0
+        allocation_height = alloc.height
 
-        if clear.y > allocation.y + allocation.height or \
-                clear.y + clear.height < allocation.y:
+        toplevel = widget.get_root()
+        if toplevel is not None:
+            point = Graphene.Point.zero()
+            result = widget.compute_point(toplevel, point)
+            if result:
+                translated = result[1]
+                allocation_x = int(translated.x)
+                allocation_y = int(translated.y)
+
+        if clear.y > allocation_y + allocation_height or \
+                clear.y + clear.height < allocation_y:
             return False
 
-        self.dy = allocation.y + allocation.height - clear.y
+        self.dy = allocation_y + allocation_height - clear.y
 
         # Ensure there's at least some room for the view
-        if self.dy > allocation.height - 80:
+        if self.dy > allocation_height - 80:
             self.dy = 0
             return False
 

@@ -109,7 +109,7 @@ class EditToolbar(Gtk.Toolbar):
         search_label = Gtk.Label(label=_("Search") + ": ")
         search_label.show()
         search_item_page_label = Gtk.ToolItem()
-        search_item_page_label.add(search_label)
+        search_item_page_label.set_child(search_label)
         self.insert(search_item_page_label, -1)
         search_item_page_label.show()
 
@@ -143,31 +143,11 @@ class EditToolbar(Gtk.Toolbar):
         self._findnext.set_sensitive(False)
 
     def __paste_button_cb(self, button):
-        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        display = Gdk.Display.get_default()
+        clipboard = display.get_clipboard()
 
-        if clipboard.wait_is_image_available():
-            pixbuf_sel = clipboard.wait_for_image()
-            activity = self._abiword_canvas.get_toplevel()
-            temp_path = os.path.join(activity.get_activity_root(), 'instance')
-            if not os.path.exists(temp_path):
-                os.makedirs(temp_path)
-            fd, file_path = tempfile.mkstemp(dir=temp_path, suffix='.png')
-            os.close(fd)
-            logging.debug('tempfile is %s' % file_path)
-            success, data = pixbuf_sel.save_to_bufferv('png', [], [])
-            if success:
-                px_file = open(file_path, 'wb')
-                px_file.write(data)
-                px_file.close()
-                self._abiword_canvas.insert_image(file_path, False)
-
-        elif clipboard.wait_is_uris_available():
-            selection = clipboard.wait_for_uris()
-            if selection is not None:
-                for uri in selection:
-                    self._abiword_canvas.insert_image(urlparse(uri).path,
-                                                      False)
-        else:
+        text = clipboard.read_text()
+        if text:
             self._abiword_canvas.paste()
 
     def __paste_special_button_cb(self, button):
@@ -220,7 +200,7 @@ class EditToolbar(Gtk.Toolbar):
         tool_item = Gtk.ToolItem()
         tool_item.set_expand(expand)
 
-        tool_item.add(widget)
+        tool_item.set_child(widget)
         widget.show()
 
         self.insert(tool_item, -1)
@@ -280,7 +260,7 @@ class InsertToolbar(Gtk.Toolbar):
             'clicked', self._split_cells_cb)
         self.insert(self._split_cells, -1)
 
-        self.show_all()
+        self.set_visible(True)
 
         self._abiword_canvas.connect('table-state', self._isTable_cb)
         # self._abiword_canvas.connect('image-selected',
@@ -355,14 +335,14 @@ class ViewToolbar(Gtk.Toolbar):
         self._zoom_spin.set_numeric(True)
         self._zoom_spin.show()
         tool_item_zoom = Gtk.ToolItem()
-        tool_item_zoom.add(self._zoom_spin)
+        tool_item_zoom.set_child(self._zoom_spin)
         self.insert(tool_item_zoom, -1)
         tool_item_zoom.show()
 
         zoom_perc_label = Gtk.Label(_("%"))
         zoom_perc_label.show()
         tool_item_zoom_perc_label = Gtk.ToolItem()
-        tool_item_zoom_perc_label.add(zoom_perc_label)
+        tool_item_zoom_perc_label.set_child(zoom_perc_label)
         self.insert(tool_item_zoom_perc_label, -1)
         tool_item_zoom_perc_label.show()
 
@@ -374,7 +354,7 @@ class ViewToolbar(Gtk.Toolbar):
         page_label = Gtk.Label(_("Page: "))
         page_label.show()
         tool_item_page_label = Gtk.ToolItem()
-        tool_item_page_label.add(page_label)
+        tool_item_page_label.set_child(page_label)
         self.insert(tool_item_page_label, -1)
         tool_item_page_label.show()
 
@@ -385,14 +365,14 @@ class ViewToolbar(Gtk.Toolbar):
         self._page_spin.set_numeric(True)
         self._page_spin.show()
         tool_item_page = Gtk.ToolItem()
-        tool_item_page.add(self._page_spin)
+        tool_item_page.set_child(self._page_spin)
         self.insert(tool_item_page, -1)
         tool_item_page.show()
 
         self._total_page_label = Gtk.Label(label=" / 0")
         self._total_page_label.show()
         tool_item = Gtk.ToolItem()
-        tool_item.add(self._total_page_label)
+        tool_item.set_child(self._total_page_label)
         self.insert(tool_item, -1)
         tool_item.show()
 
@@ -521,11 +501,16 @@ class TextToolbar(Gtk.Toolbar):
         color.connect('notify::color', self._text_color_cb,
                       abiword_canvas)
         tool_item = Gtk.ToolItem()
-        tool_item.add(color)
+        tool_item.set_child(color)
         self.insert(tool_item, -1)
-        abiword_canvas.connect(
-            'color', lambda abi, r, g, b:
-            color.set_color(Gdk.Color(r * 256, g * 256, b * 256)))
+        def _set_color(abi, r, g, b):
+            rgba = Gdk.RGBA()
+            rgba.red = r
+            rgba.green = g
+            rgba.blue = b
+            rgba.alpha = 1.0
+            color.set_color(rgba)
+        abiword_canvas.connect('color', _set_color)
 
         # MAGIC NUMBER WARNING: Secondary toolbars are not a standard height?
         self.set_size_request(-1, style.GRID_CELL_SIZE)
@@ -564,7 +549,7 @@ class TextToolbar(Gtk.Toolbar):
 
         self.insert(self._aligment_btn, -1)
 
-        self.show_all()
+        self.set_visible(True)
 
     def _font_changed_cb(self, combobox, abi):
         logger.debug('Setting font: %s', combobox.get_font_name())
@@ -598,9 +583,9 @@ class TextToolbar(Gtk.Toolbar):
 
     def _text_color_cb(self, button, pspec, abiword_canvas):
         newcolor = button.get_color()
-        abiword_canvas.set_text_color(int(newcolor.red / 256.0),
-                                      int(newcolor.green / 256.0),
-                                      int(newcolor.blue / 256.0))
+        abiword_canvas.set_text_color(int(newcolor.red * 255),
+                                      int(newcolor.green * 255),
+                                      int(newcolor.blue * 255))
 
 
 class ParagraphToolbar(Gtk.Toolbar):
@@ -705,4 +690,4 @@ class ParagraphToolbar(Gtk.Toolbar):
 
         self.insert(list_btn, -1)
 
-        self.show_all()
+        self.set_visible(True)

@@ -20,12 +20,10 @@ from gettext import gettext as _
 import logging
 import os
 
-# Abiword needs this to happen as soon as possible
 from gi.repository import GObject
-GObject.threads_init()
 
 import gi
-gi.require_version('Gtk', '3.0')
+gi.require_version('Gtk', '4.0')
 gi.require_version('TelepathyGLib', '0.12')
 
 from gi.repository import Gtk
@@ -61,18 +59,18 @@ except:
 logger = logging.getLogger('write-activity')
 
 
-class ConnectingBox(Gtk.VBox):
+class ConnectingBox(Gtk.Box):
 
     def __init__(self):
-        Gtk.VBox.__init__(self)
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
         self.props.halign = Gtk.Align.CENTER
         self.props.valign = Gtk.Align.CENTER
         waiting_icon = Icon(icon_name='zoom-neighborhood',
                             pixel_size=style.STANDARD_ICON_SIZE)
         waiting_icon.set_xo_color(XoColor('white'))
-        self.add(waiting_icon)
-        self.add(Gtk.Label(_('Connecting...')))
-        self.show_all()
+        self.append(waiting_icon)
+        self.append(Gtk.Label(_('Connecting...')))
+        self.set_visible(True)
         self.hide()
 
 
@@ -92,8 +90,8 @@ class AbiWordActivity(activity.Activity):
         self.activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(self.activity_button, -1)
 
-        separator = Gtk.SeparatorToolItem()
-        separator.show()
+        separator = Gtk.Separator()
+        separator.set_visible(True)
         self.activity_button.props.page.insert(separator, 2)
         ExportButtonFactory(self, self.abiword_canvas)
         self.activity_button.show()
@@ -116,7 +114,7 @@ class AbiWordActivity(activity.Activity):
         self.speech_toolbar_button.set_page(self.speech_toolbar)
         self.speech_toolbar_button.show()
 
-        separator = Gtk.SeparatorToolItem()
+        separator = Gtk.Separator()
         toolbar_box.toolbar.insert(separator, -1)
 
         text_toolbar = ToolbarButton()
@@ -151,22 +149,20 @@ class AbiWordActivity(activity.Activity):
         box.append_item(menu_item)
         menu_item.show()
 
-        separator = Gtk.SeparatorToolItem()
-        separator.props.draw = False
-        separator.set_size_request(0, -1)
+        separator = Gtk.Separator()
         separator.set_expand(True)
-        separator.show()
+        separator.set_visible(True)
         toolbar_box.toolbar.insert(separator, -1)
 
         stop = StopButton(self)
         toolbar_box.toolbar.insert(stop, -1)
 
-        toolbar_box.show_all()
+        toolbar_box.set_visible(True)
         self.set_toolbar_box(toolbar_box)
 
         # add a overlay to be able to show a icon while joining a shared doc
         overlay = Gtk.Overlay()
-        overlay.add(self.abiword_canvas)
+        overlay.set_child(self.abiword_canvas)
         overlay.show()
 
         self._connecting_box = ConnectingBox()
@@ -207,7 +203,7 @@ class AbiWordActivity(activity.Activity):
 
         self.abiword_canvas.zoom_width()
         self.abiword_canvas.show()
-        self.connect_after('map-event', self.__map_activity_event_cb)
+        self.connect('map', self.__map_activity_event_cb)
 
         self.abiword_canvas.connect('size-allocate', self.size_allocate_cb)
 
