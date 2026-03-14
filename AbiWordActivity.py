@@ -19,7 +19,6 @@
 from gettext import gettext as _
 import logging
 import os
-logging.warning("DEV REPO WRITE ACTIVITY RUNNING")
 from gi.repository import GObject
 
 import gi
@@ -62,7 +61,7 @@ logger = logging.getLogger('write-activity')
 class ConnectingBox(Gtk.Box):
 
     def __init__(self):
-        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
+        super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.props.halign = Gtk.Align.CENTER
         self.props.valign = Gtk.Align.CENTER
         waiting_icon = Icon(icon_name='zoom-neighborhood',
@@ -70,8 +69,7 @@ class ConnectingBox(Gtk.Box):
         waiting_icon.set_xo_color(XoColor('white'))
         self.append(waiting_icon)
         self.append(Gtk.Label(_('Connecting...')))
-        self.set_visible(True)
-        self.hide()
+        self.set_visible(False)
 
 
 class AbiWordActivity(activity.Activity):
@@ -90,7 +88,7 @@ class AbiWordActivity(activity.Activity):
         self.activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(self.activity_button, -1)
 
-        separator = Gtk.Separator()
+        separator = Gtk.SeparatorToolItem()
         separator.set_visible(True)
         self.activity_button.props.page.insert(separator, 2)
         ExportButtonFactory(self, self.abiword_canvas)
@@ -114,7 +112,7 @@ class AbiWordActivity(activity.Activity):
         self.speech_toolbar_button.set_page(self.speech_toolbar)
         self.speech_toolbar_button.show()
 
-        separator = Gtk.Separator()
+        separator = Gtk.SeparatorToolItem()
         toolbar_box.toolbar.insert(separator, -1)
 
         text_toolbar = ToolbarButton()
@@ -149,7 +147,8 @@ class AbiWordActivity(activity.Activity):
         box.append_item(menu_item)
         menu_item.show()
 
-        separator = Gtk.Separator()
+        separator = Gtk.SeparatorToolItem()
+        separator.props.draw = False
         separator.set_expand(True)
         separator.set_visible(True)
         toolbar_box.toolbar.insert(separator, -1)
@@ -163,7 +162,7 @@ class AbiWordActivity(activity.Activity):
         # add a overlay to be able to show a icon while joining a shared doc
         overlay = Gtk.Overlay()
         overlay.set_child(self.abiword_canvas)
-        overlay.show()
+
 
         self._connecting_box = ConnectingBox()
         overlay.add_overlay(self._connecting_box)
@@ -199,7 +198,7 @@ class AbiWordActivity(activity.Activity):
                 self._joined_cb(self)
         else:
             # we are creating the activity
-            logger.debug("We are creating an activity")
+            logger.debug('Creating activity')
 
         self.abiword_canvas.zoom_width()
         self.abiword_canvas.show()

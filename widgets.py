@@ -25,7 +25,10 @@ except:
     gi.require_version('Abi', '3.0')
 from gi.repository import Abi
 from gi.repository import GLib
-from gi.repository import Graphene
+try:
+    from gi.repository import Graphene
+except Exception:
+    Graphene = None
 
 from sugar3.graphics.radiotoolbutton import RadioToolButton
 from sugar3.graphics.toolbutton import ToolButton
@@ -228,7 +231,7 @@ class DocumentView(Abi.Widget):
         self.moveto_right()
         return False
 
-    def __size_allocate_cb(self, widget, width, height):
+    def __size_allocate_cb(self, widget, allocation):
         if self.osk_changed is True:
             self.moveto_left()
             GLib.timeout_add(100, self.__shallow_move_cb)
@@ -241,7 +244,7 @@ class DocumentView(Abi.Widget):
         allocation_height = alloc.height
 
         toplevel = widget.get_root()
-        if toplevel is not None:
+        if toplevel is not None and Graphene is not None:
             point = Graphene.Point.zero()
             result = widget.compute_point(toplevel, point)
             if result:

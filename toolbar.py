@@ -23,9 +23,6 @@ from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GObject
 
-import os
-import tempfile
-from urllib.parse import urlparse
 
 from sugar3.graphics.toolbutton import ToolButton
 from sugar3.graphics.toolcombobox import ToolComboBox
@@ -144,11 +141,20 @@ class EditToolbar(Gtk.Toolbar):
 
     def __paste_button_cb(self, button):
         display = Gdk.Display.get_default()
+        if display is None:
+            return
         clipboard = display.get_clipboard()
 
-        text = clipboard.read_text()
-        if text:
-            self._abiword_canvas.paste()
+        def _on_clipboard_text(clipboard, result):
+            try:
+                text = clipboard.read_text_finish(result)
+            except Exception:
+                return
+
+            if text:
+                self._abiword_canvas.paste()
+
+        clipboard.read_text_async(None, _on_clipboard_text)
 
     def __paste_special_button_cb(self, button):
         self._abiword_canvas.paste_special()
@@ -358,7 +364,7 @@ class ViewToolbar(Gtk.Toolbar):
         self.insert(tool_item_page_label, -1)
         tool_item_page_label.show()
 
-        self._page_spin_adj = Gtk.Adjustment(0, 1, 0, -1, -1, 0)
+        self._page_spin_adj = Gtk.Adjustment(0, 1, 1, 1, 1, 0)
         self._page_spin = Gtk.SpinButton.new(self._page_spin_adj, 0, 0)
         self._page_spin_id = self._page_spin.connect('value-changed',
                                                      self._page_spin_cb)
