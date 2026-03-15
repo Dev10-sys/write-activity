@@ -57,13 +57,13 @@ class EditToolbar(Gtk.Box):
         copy = CopyButton()
         copy.props.accelerator = '<Ctrl>C'
         copy.connect('clicked', lambda button: pc.abiword_canvas.copy())
-        self.append(copy)
+        self.pack_start(copy, False, False, 0)
         copy.show()
 
         paste = PasteButton()
         paste.props.accelerator = '<Ctrl>V'
         paste.connect('clicked', self.__paste_button_cb)
-        self.append(paste)
+        self.pack_start(paste, False, False, 0)
         paste.show()
 
         menu_box = PaletteMenuBox()
@@ -75,21 +75,21 @@ class EditToolbar(Gtk.Box):
         menu_box.append_item(menu_item)
 
         separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        self.append(separator)
+        self.pack_start(separator, False, False, 0)
         separator.show()
 
         undo = UndoButton(sensitive=True)
         undo.connect('clicked', lambda button: pc.abiword_canvas.undo())
         pc.abiword_canvas.connect("can-undo", lambda abi, can_undo:
                                   undo.set_sensitive(can_undo))
-        self.append(undo)
+        self.pack_start(undo, False, False, 0)
         undo.show()
 
         redo = RedoButton(sensitive=True)
         redo.connect('clicked', lambda button: pc.abiword_canvas.redo())
         pc.abiword_canvas.connect("can-redo", lambda abi, can_redo:
                                   redo.set_sensitive(can_redo))
-        self.append(redo)
+        self.pack_start(redo, False, False, 0)
         redo.show()
 
         pc.abiword_canvas.connect('text-selected', lambda abi, b:
@@ -100,14 +100,14 @@ class EditToolbar(Gtk.Box):
                                   copy.set_sensitive(False))
 
         separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
-        self.append(separator)
+        self.pack_start(separator, False, False, 0)
         separator.show()
 
         search_label = Gtk.Label(label=_("Search") + ": ")
         search_label.show()
         search_item_page_label = Gtk.Box()
-        search_item_page_label.set_child(search_label)
-        self.append(search_item_page_label)
+        search_item_page_label.add(search_label)
+        self.pack_start(search_item_page_label, False, False, 0)
         search_item_page_label.show()
 
         # setup the search options
@@ -121,13 +121,13 @@ class EditToolbar(Gtk.Box):
 
         self._findprev = ToolButton('go-previous-paired')
         self._findprev.set_tooltip(_('Find previous'))
-        self.append(self._findprev)
+        self.pack_start(self._findprev, False, False, 0)
         self._findprev.show()
         self._findprev.connect('clicked', self._findprev_cb)
 
         self._findnext = ToolButton('go-next-paired')
         self._findnext.set_tooltip(_('Find next'))
-        self.append(self._findnext)
+        self.pack_start(self._findnext, False, False, 0)
         self._findnext.show()
         self._findnext.connect('clicked', self._findnext_cb)
 
@@ -206,10 +206,10 @@ class EditToolbar(Gtk.Box):
         tool_item = Gtk.Box()
         tool_item.set_expand(expand)
 
-        tool_item.set_child(widget)
+        tool_item.add(widget)
         widget.show()
 
-        self.append(tool_item)
+        self.pack_start(tool_item, False, False, 0)
         tool_item.show()
 
 
@@ -228,43 +228,43 @@ class InsertToolbar(Gtk.Box):
         palette = self._table_btn.get_palette()
         palette.set_content(self._grid_create)
         self._table_btn.connect('clicked', self._table_btn_clicked_cb)
-        self.append(self._table_btn)
+        self.pack_start(self._table_btn, False, False, 0)
 
         self._table_rows_after = ToolButton('row-insert')
         self._table_rows_after.set_tooltip(_('Insert Row'))
         self._table_rows_after_id = self._table_rows_after.connect(
             'clicked', self._table_rows_after_cb)
-        self.append(self._table_rows_after)
+        self.pack_start(self._table_rows_after, False, False, 0)
 
         self._table_delete_rows = ToolButton('row-remove')
         self._table_delete_rows.set_tooltip(_('Delete Row'))
         self._table_delete_rows_id = self._table_delete_rows.connect(
             'clicked', self._table_delete_rows_cb)
-        self.append(self._table_delete_rows)
+        self.pack_start(self._table_delete_rows, False, False, 0)
 
         self._table_cols_after = ToolButton('column-insert')
         self._table_cols_after.set_tooltip(_('Insert Column'))
         self._table_cols_after_id = self._table_cols_after.connect(
             'clicked', self._table_cols_after_cb)
-        self.append(self._table_cols_after)
+        self.pack_start(self._table_cols_after, False, False, 0)
 
         self._table_delete_cols = ToolButton('column-remove')
         self._table_delete_cols.set_tooltip(_('Delete Column'))
         self._table_delete_cols_id = self._table_delete_cols.connect(
             'clicked', self._table_delete_cols_cb)
-        self.append(self._table_delete_cols)
+        self.pack_start(self._table_delete_cols, False, False, 0)
 
         self._merge_cells = ToolButton('format-columns-single')
         self._merge_cells.set_tooltip(_('Merge Cells'))
         self._merge_cells_id = self._merge_cells.connect(
             'clicked', self._merge_cells_cb)
-        self.append(self._merge_cells)
+        self.pack_start(self._merge_cells, False, False, 0)
 
         self._split_cells = ToolButton('format-columns-double')
         self._split_cells.set_tooltip(_('Split Cells'))
         self._split_cells_id = self._split_cells.connect(
             'clicked', self._split_cells_cb)
-        self.append(self._split_cells)
+        self.pack_start(self._split_cells, False, False, 0)
 
         self.set_visible(True)
 
@@ -317,20 +317,20 @@ class ViewToolbar(Gtk.Box):
         self._zoom_out.set_tooltip(_('Zoom Out'))
         self._zoom_out_id = self._zoom_out.connect(
             'clicked', self._zoom_out_cb)
-        self.append(self._zoom_out)
+        self.pack_start(self._zoom_out, False, False, 0)
         self._zoom_out.show()
 
         self._zoom_in = ToolButton('zoom-in')
         self._zoom_in.set_tooltip(_('Zoom In'))
         self._zoom_in_id = self._zoom_in.connect('clicked',
                                                  self._zoom_in_cb)
-        self.append(self._zoom_in)
+        self.pack_start(self._zoom_in, False, False, 0)
         self._zoom_in.show()
 
         self._zoom_to_width = ToolButton('zoom-best-fit')
         self._zoom_to_width.set_tooltip(_('Zoom to width'))
         self._zoom_to_width.connect('clicked', self._zoom_to_width_cb)
-        self.append(self._zoom_to_width)
+        self.pack_start(self._zoom_to_width, False, False, 0)
         self._zoom_to_width.show()
 
         # TODO: fix the initial value
@@ -341,26 +341,26 @@ class ViewToolbar(Gtk.Box):
         self._zoom_spin.set_numeric(True)
         self._zoom_spin.show()
         tool_item_zoom = Gtk.Box()
-        tool_item_zoom.set_child(self._zoom_spin)
-        self.append(tool_item_zoom)
+        tool_item_zoom.add(self._zoom_spin)
+        self.pack_start(tool_item_zoom, False, False, 0)
         tool_item_zoom.show()
 
         zoom_perc_label = Gtk.Label(_("%"))
         zoom_perc_label.show()
         tool_item_zoom_perc_label = Gtk.Box()
-        tool_item_zoom_perc_label.set_child(zoom_perc_label)
-        self.append(tool_item_zoom_perc_label)
+        tool_item_zoom_perc_label.add(zoom_perc_label)
+        self.pack_start(tool_item_zoom_perc_label, False, False, 0)
         tool_item_zoom_perc_label.show()
 
         separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
         separator.show()
-        self.append(separator)
+        self.pack_start(separator, False, False, 0)
 
         page_label = Gtk.Label(_("Page: "))
         page_label.show()
         tool_item_page_label = Gtk.Box()
-        tool_item_page_label.set_child(page_label)
-        self.append(tool_item_page_label)
+        tool_item_page_label.add(page_label)
+        self.pack_start(tool_item_page_label, False, False, 0)
         tool_item_page_label.show()
 
         self._page_spin_adj = Gtk.Adjustment(0, 1, 1, 1, 1, 0)
@@ -370,15 +370,15 @@ class ViewToolbar(Gtk.Box):
         self._page_spin.set_numeric(True)
         self._page_spin.show()
         tool_item_page = Gtk.Box()
-        tool_item_page.set_child(self._page_spin)
-        self.append(tool_item_page)
+        tool_item_page.add(self._page_spin)
+        self.pack_start(tool_item_page, False, False, 0)
         tool_item_page.show()
 
         self._total_page_label = Gtk.Label(label=" / 0")
         self._total_page_label.show()
         tool_item = Gtk.Box()
-        tool_item.set_child(self._total_page_label)
-        self.append(tool_item)
+        tool_item.add(self._total_page_label)
+        self.pack_start(tool_item, False, False, 0)
         tool_item.show()
 
         self._abiword_canvas.connect("page-count", self._page_count_cb)
@@ -445,14 +445,14 @@ class TextToolbar(Gtk.Box):
             'changed', self._font_changed_cb, abiword_canvas)
         self._abi_handler = abiword_canvas.connect('font-family',
                                                    self._font_family_cb)
-        self.append(ToolComboBox(self.font_name_combo))
+        self.pack_start(ToolComboBox(self.font_name_combo), False, False, 0)
 
         self.font_size = FontSize()
         self._abi_handler = abiword_canvas.connect('font-size',
                                                    self._font_size_cb)
         self._font_size_changed_id = self.font_size.connect(
             'changed', self._font_size_changed_cb, abiword_canvas)
-        self.append(self.font_size)
+        self.pack_start(self.font_size, False, False, 0)
 
         bold = ToggleToolButton('format-text-bold')
         bold.set_tooltip(_('Bold'))
@@ -461,7 +461,7 @@ class TextToolbar(Gtk.Box):
                                abiword_canvas.toggle_bold())
         abiword_canvas.connect('bold', lambda abi, b:
                                self._setToggleButtonState(bold, b, bold_id))
-        self.append(bold)
+        self.pack_start(bold, False, False, 0)
 
         italic = ToggleToolButton('format-text-italic')
         italic.set_tooltip(_('Italic'))
@@ -471,7 +471,7 @@ class TextToolbar(Gtk.Box):
         abiword_canvas.connect('italic', lambda abi, b:
                                self._setToggleButtonState(italic, b,
                                                           italic_id))
-        self.append(italic)
+        self.pack_start(italic, False, False, 0)
 
         underline = ToggleToolButton('format-text-underline')
         underline.set_tooltip(_('Underline'))
@@ -481,7 +481,7 @@ class TextToolbar(Gtk.Box):
         abiword_canvas.connect('underline', lambda abi, b:
                                self._setToggleButtonState(underline, b,
                                                           underline_id))
-        self.append(underline)
+        self.pack_start(underline, False, False, 0)
 
         super_btn = ToggleToolButton('format-text-super')
         super_btn.set_tooltip(_('Superscript'))
@@ -491,7 +491,7 @@ class TextToolbar(Gtk.Box):
         abiword_canvas.connect('superscript', lambda abi, b:
                                self._setToggleButtonState(super_btn, b,
                                                           super_id))
-        self.append(super_btn)
+        self.pack_start(super_btn, False, False, 0)
 
         sub = ToggleToolButton('format-text-sub')
         sub.set_tooltip(_('Subscript'))
@@ -500,14 +500,14 @@ class TextToolbar(Gtk.Box):
                              abiword_canvas.toggle_sub())
         abiword_canvas.connect('subscript', lambda abi, b:
                                self._setToggleButtonState(sub, b, sub_id))
-        self.append(sub)
+        self.pack_start(sub, False, False, 0)
 
         color = ColorToolButton()
         color.connect('notify::color', self._text_color_cb,
                       abiword_canvas)
         tool_item = Gtk.Box()
-        tool_item.set_child(color)
-        self.append(tool_item)
+        tool_item.add(color)
+        self.pack_start(tool_item, False, False, 0)
         def _set_color(abi, r, g, b):
             rgba = Gdk.RGBA()
             rgba.red = r
@@ -552,7 +552,7 @@ class TextToolbar(Gtk.Box):
                      abiword_canvas.align_justify, 'justify-align',
                      self._aligment_btn, menu_box)
 
-        self.append(self._aligment_btn)
+        self.pack_start(self._aligment_btn, False, False, 0)
 
         self.set_visible(True)
 
@@ -603,7 +603,7 @@ class ParagraphToolbar(Gtk.Box):
             button.props.icon_name = icon_name
             button.props.group = group
             button.props.tooltip = tooltip
-            self.append(button)
+            self.pack_start(button, False, False, 0)
             return button
 
         group = None
@@ -639,7 +639,7 @@ class ParagraphToolbar(Gtk.Box):
                      lambda: abi.set_style('Plain Text'),
                      lambda abi, style: style == 'Plain Text')
 
-        self.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
+        self.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 0)
 
         def append_list(icon_name, tooltip, do_abi_cb, on_abi_cb, button,
                         menu_box, button_icon=None):
@@ -693,6 +693,6 @@ class ParagraphToolbar(Gtk.Box):
                     lambda abi, style: style == 'Upper Case List', list_btn,
                     menu_box)
 
-        self.append(list_btn)
+        self.pack_start(list_btn, False, False, 0)
 
         self.set_visible(True)
