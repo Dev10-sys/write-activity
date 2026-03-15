@@ -43,7 +43,7 @@ logger = logging.getLogger('write-activity')
 class AbiButton(RadioToolButton):
 
     def __init__(self, abi, abi_signal, do_abi_cb, on_abi_cb=None, **kwargs):
-        RadioToolButton.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
         self._abi_handler = abi.connect(abi_signal, self.__abi_cb,
                                         abi_signal, on_abi_cb)
@@ -83,7 +83,7 @@ class AbiMenuItem(PaletteMenuItem):
         # the list menu
         self._button_icon_name = button_icon_name
         self._button = button
-        PaletteMenuItem.__init__(self, icon_name=icon_name, text_label=label)
+        super().__init__(icon_name=icon_name, text_label=label)
 
         self._abi_handler = abi.connect(abi_signal, self.__abi_cb,
                                         abi_signal, on_abi_cb)
@@ -212,7 +212,7 @@ class DocumentView(Abi.Widget):
 
     def __init__(self):
         Abi.init([])
-        Abi.Widget.__init__(self)
+        super().__init__()
         self.connect('size-allocate', self.__size_allocate_cb)
         try:
             self.connect('request-clear-area', self.__request_clear_area_cb)

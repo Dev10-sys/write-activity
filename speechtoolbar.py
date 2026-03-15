@@ -22,10 +22,10 @@ from sugar3.graphics.toolbutton import ToolButton
 from sugar3.speech import SpeechManager
 
 
-class SpeechToolbar(Gtk.Toolbar):
+class SpeechToolbar(Gtk.Box):
 
     def __init__(self, activity):
-        Gtk.Toolbar.__init__(self)
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.HORIZONTAL)
         self._activity = activity
         self._speech = SpeechManager()
 
@@ -37,7 +37,7 @@ class SpeechToolbar(Gtk.Toolbar):
             button = ToolButton(icon)
             button.show()
             button.connect('clicked', callback)
-            self.insert(button, -1)
+            self.append(button)
             button.set_tooltip(tip)
             return button
 

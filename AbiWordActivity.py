@@ -22,13 +22,13 @@ import os
 from gi.repository import GObject
 
 import gi
-gi.require_version('Gtk', '4.0')
+gi.require_version('Gtk', '3.0')
 gi.require_version('TelepathyGLib', '0.12')
 
 from gi.repository import Gtk
 from gi.repository import TelepathyGLib
 
-from sugartoolkit.activity import Activity
+from sugar3.activity import activity
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.activity import get_bundle_path
@@ -69,13 +69,14 @@ class ConnectingBox(Gtk.Box):
         waiting_icon.set_xo_color(XoColor('white'))
         self.append(waiting_icon)
         self.append(Gtk.Label(_('Connecting...')))
-        self.set_visible(False)
+        self.set_visible(True)
+        self.hide()
 
 
-class AbiWordActivity(Activity):
+class AbiWordActivity(activity.Activity):
 
     def __init__(self, handle):
-        activity.Activity.__init__(self, handle)
+        super().__init__(handle)
 
         # abiword uses the current directory for all its file dialogs
         os.chdir(os.path.expanduser('~'))
@@ -88,7 +89,7 @@ class AbiWordActivity(Activity):
         self.activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(self.activity_button, -1)
 
-        separator = Gtk.SeparatorToolItem()
+        separator = Gtk.Separator()
         separator.set_visible(True)
         self.activity_button.props.page.insert(separator, 2)
         ExportButtonFactory(self, self.abiword_canvas)
@@ -112,7 +113,7 @@ class AbiWordActivity(Activity):
         self.speech_toolbar_button.set_page(self.speech_toolbar)
         self.speech_toolbar_button.show()
 
-        separator = Gtk.SeparatorToolItem()
+        separator = Gtk.Separator()
         toolbar_box.toolbar.insert(separator, -1)
 
         text_toolbar = ToolbarButton()
@@ -147,9 +148,8 @@ class AbiWordActivity(Activity):
         box.append_item(menu_item)
         menu_item.show()
 
-        separator = Gtk.SeparatorToolItem()
-        separator.props.draw = False
-        separator.set_expand(True)
+        separator = Gtk.Separator()
+        separator.set_hexpand(True)
         separator.set_visible(True)
         toolbar_box.toolbar.insert(separator, -1)
 
