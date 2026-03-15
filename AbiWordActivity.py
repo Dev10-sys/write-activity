@@ -28,7 +28,7 @@ gi.require_version('TelepathyGLib', '0.12')
 from gi.repository import Gtk
 from gi.repository import TelepathyGLib
 
-from sugar3.activity import activity
+from sugartoolkit.activity import Activity
 from sugar3.activity.widgets import StopButton
 from sugar3.activity.widgets import ActivityToolbarButton
 from sugar3.activity.activity import get_bundle_path
@@ -72,7 +72,7 @@ class ConnectingBox(Gtk.Box):
         self.set_visible(False)
 
 
-class AbiWordActivity(activity.Activity):
+class AbiWordActivity(Activity):
 
     def __init__(self, handle):
         activity.Activity.__init__(self, handle)
