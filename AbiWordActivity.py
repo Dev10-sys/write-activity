@@ -89,8 +89,9 @@ class AbiWordActivity(activity.Activity):
         self.activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(self.activity_button, -1)
 
-        separator = Gtk.Separator()
-        separator.set_visible(True)
+        separator = Gtk.SeparatorToolItem()
+        separator.set_draw(False)
+        separator.show()
         self.activity_button.props.page.insert(separator, 2)
         ExportButtonFactory(self, self.abiword_canvas)
         self.activity_button.show()

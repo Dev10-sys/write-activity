@@ -26,6 +26,7 @@ except:
 from gi.repository import Abi
 from gi.repository import GLib
 try:
+    gi.require_version('Graphene', '1.0')
     from gi.repository import Graphene
 except Exception:
     Graphene = None
