@@ -15,9 +15,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
-from gi.repository import Gtk
-from gi.repository import Gdk
-from gi.repository import GObject
+import gi
+gi.require_version("Gtk", "4.0")
+
+from gi.repository import Gtk, Gdk, GObject
 
 from sugar3.graphics import style
 
@@ -32,7 +33,7 @@ class GridCreateWidget(Gtk.DrawingArea):
             GObject.SignalFlags.RUN_FIRST, None, [int, int]), }
 
     def __init__(self):
-        super(GridCreateWidget, self).__init__()
+        super().__init__()
         self._cell_width = style.GRID_CELL_SIZE
         self._cell_height = int(self._cell_width / 2)
         self._rows = 0
@@ -41,41 +42,38 @@ class GridCreateWidget(Gtk.DrawingArea):
         self._min_columns = 3
 
         # Padding to the sides are not added automatically
-        self.props.margin_left = style.DEFAULT_SPACING
-        self.props.margin_right = style.DEFAULT_SPACING
+        self.set_margin_start(style.DEFAULT_SPACING)
+        self.set_margin_end(style.DEFAULT_SPACING)
 
         self._update_size()
-        self.connect('draw', self.__draw_cb)
-        self.set_events(Gdk.EventMask.TOUCH_MASK)
-        self.add_events(Gdk.EventMask.BUTTON_PRESS_MASK)
-        self.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK)
-        self.add_events(Gdk.EventMask.BUTTON_MOTION_MASK)
-        self.connect('event', self.__event_cb)
+        self.set_draw_func(self.__draw_cb)
 
-    def __event_cb(self, widget, event):
-        if event.type in (
-                Gdk.EventType.TOUCH_BEGIN,
-                Gdk.EventType.TOUCH_CANCEL, Gdk.EventType.TOUCH_END,
-                Gdk.EventType.TOUCH_UPDATE, Gdk.EventType.BUTTON_PRESS,
-                Gdk.EventType.BUTTON_RELEASE, Gdk.EventType.MOTION_NOTIFY):
-            x = event.get_coords()[1]
-            y = event.get_coords()[2]
+        click = Gtk.GestureClick()
+        click.connect("pressed", self.__pressed_cb)
+        click.connect("released", self.__released_cb)
+        self.add_controller(click)
 
-            if event.type in (
-                    Gdk.EventType.TOUCH_BEGIN,
-                    Gdk.EventType.TOUCH_UPDATE, Gdk.EventType.BUTTON_PRESS,
-                    Gdk.EventType.MOTION_NOTIFY):
-                # update rows and cols
-                columns = int(x / self._cell_width) + 1
-                rows = int(y / self._cell_height) + 1
-                if self._columns != columns or self._rows != rows:
-                    self._columns = columns
-                    self._rows = rows
-                    self._update_size()
+        motion = Gtk.EventControllerMotion()
+        motion.connect("motion", self.__motion_cb)
+        self.add_controller(motion)
 
-            elif event.type in (Gdk.EventType.TOUCH_END,
-                                Gdk.EventType.BUTTON_RELEASE):
-                self.emit('create-table', self._rows, self._columns)
+    def _update_cell_position(self, x, y):
+        columns = int(x / self._cell_width) + 1
+        rows = int(y / self._cell_height) + 1
+
+        if self._columns != columns or self._rows != rows:
+            self._columns = columns
+            self._rows = rows
+            self._update_size()
+
+    def __pressed_cb(self, gesture, n_press, x, y):
+        self._update_cell_position(x, y)
+
+    def __released_cb(self, gesture, n_press, x, y):
+        self.emit("create-table", self._rows, self._columns)
+
+    def __motion_cb(self, controller, x, y):
+        self._update_cell_position(x, y)
 
     def _update_size(self):
         self._min_col = max(self._columns + 1, self._min_columns)
@@ -87,7 +85,7 @@ class GridCreateWidget(Gtk.DrawingArea):
                               self._height + style.LINE_WIDTH)
         self.queue_draw()
 
-    def __draw_cb(self, widget, cr):
+    def __draw_cb(self, area, cr, width, height):
         # background
         cr.set_source_rgba(*style.COLOR_BLACK.get_rgba())
         cr.rectangle(0, 0, self._width, self._height)
@@ -124,16 +122,20 @@ class GridCreateWidget(Gtk.DrawingArea):
 class GridCreateTest(Gtk.Window):
 
     def __init__(self):
-        super(GridCreateTest, self).__init__()
-        self.connect("destroy", Gtk.main_quit)
+        super().__init__()
         grid_create = GridCreateWidget()
         grid_create.connect('create-table', self.__create_table)
-        self.add(grid_create)
-        self.show_all()
+        self.set_child(grid_create)
+        self.present()
 
     def __create_table(self, grid_creator, rows, columns):
         print('rows %d columns %d' % (rows, columns))
 
 if __name__ == '__main__':
-    GridCreateTest()
-    Gtk.main()
+    app = Gtk.Application(application_id="org.sugarlabs.GridCreateTest")
+    def on_activate(app):
+        win = GridCreateTest()
+        win.set_application(app)
+        win.present()
+    app.connect("activate", on_activate)
+    app.run()

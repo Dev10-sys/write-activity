@@ -39,7 +39,7 @@ logger = logging.getLogger('write-activity')
 class AbiButton(RadioToolButton):
 
     def __init__(self, abi, abi_signal, do_abi_cb, on_abi_cb=None, **kwargs):
-        RadioToolButton.__init__(self, **kwargs)
+        super().__init__(**kwargs)
 
         self._abi_handler = abi.connect(abi_signal, self.__abi_cb,
                                         abi_signal, on_abi_cb)
@@ -79,7 +79,7 @@ class AbiMenuItem(PaletteMenuItem):
         # the list menu
         self._button_icon_name = button_icon_name
         self._button = button
-        PaletteMenuItem.__init__(self, icon_name=icon_name, text_label=label)
+        super().__init__(icon_name=icon_name, text_label=label)
 
         self._abi_handler = abi.connect(abi_signal, self.__abi_cb,
                                         abi_signal, on_abi_cb)
@@ -208,7 +208,7 @@ class DocumentView(Abi.Widget):
 
     def __init__(self):
         Abi.init([])
-        Abi.Widget.__init__(self)
+        super().__init__()
         self.connect('size-allocate', self.__size_allocate_cb)
         try:
             self.connect('request-clear-area', self.__request_clear_area_cb)
@@ -228,7 +228,7 @@ class DocumentView(Abi.Widget):
         return False
 
     def __size_allocate_cb(self, widget, allocation):
-        self.set_allocation(allocation)
+        # self.set_allocation(allocation)
 
         if self.get_child() is not None:
             child_allocation = allocation
@@ -246,8 +246,9 @@ class DocumentView(Abi.Widget):
         allocation = widget.get_allocation()
         allocation.x = 0
         allocation.y = 0
-        allocation.x, allocation.y = \
-            widget.get_window().get_root_coords(allocation.x, allocation.y)
+        surface = widget.get_surface()
+        if surface:
+            allocation.x, allocation.y = surface.get_origin()
 
         if clear.y > allocation.y + allocation.height or \
                 clear.y + clear.height < allocation.y:
