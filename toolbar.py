@@ -74,7 +74,7 @@ class EditToolbar(Gtk.Box):
         menu_item.connect('activate', self.__paste_special_button_cb)
         menu_box.append_item(menu_item)
 
-        separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        separator = Gtk.Separator.new(Gtk.Orientation.VERTICAL)
         self.pack_start(separator, False, False, 0)
         separator.show()
 
@@ -99,7 +99,7 @@ class EditToolbar(Gtk.Box):
         pc.abiword_canvas.connect('selection-cleared', lambda abi, b:
                                   copy.set_sensitive(False))
 
-        separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        separator = Gtk.Separator.new(Gtk.Orientation.VERTICAL)
         self.pack_start(separator, False, False, 0)
         separator.show()
 
@@ -352,7 +352,7 @@ class ViewToolbar(Gtk.Box):
         self.pack_start(tool_item_zoom_perc_label, False, False, 0)
         tool_item_zoom_perc_label.show()
 
-        separator = Gtk.Separator(orientation=Gtk.Orientation.VERTICAL)
+        separator = Gtk.Separator.new(Gtk.Orientation.VERTICAL)
         separator.show()
         self.pack_start(separator, False, False, 0)
 
@@ -639,7 +639,7 @@ class ParagraphToolbar(Gtk.Box):
                      lambda: abi.set_style('Plain Text'),
                      lambda abi, style: style == 'Plain Text')
 
-        self.pack_start(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL), False, False, 0)
+        self.pack_start(Gtk.Separator.new(Gtk.Orientation.VERTICAL), False, False, 0)
 
         def append_list(icon_name, tooltip, do_abi_cb, on_abi_cb, button,
                         menu_box, button_icon=None):

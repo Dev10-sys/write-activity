@@ -35,10 +35,12 @@ class SpeechToolbar(Gtk.Box):
 
         def make_button(icon, callback, tip):
             button = ToolButton(icon)
-            button.show()
             button.connect('clicked', callback)
-            self.pack_start(button, False, False, 0)
             button.set_tooltip(tip)
+
+            self.pack_start(button, False, False, 0)
+            button.show()
+
             return button
 
         self._play_button = make_button(

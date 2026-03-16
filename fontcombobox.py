@@ -59,11 +59,11 @@ class FontComboBox(Gtk.ToolItem):
         bt = Gtk.Button()
         bt.set_can_focus(False)
         box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
-        bt.set_child(box)
+        bt.add(box)
         icon = Icon(icon_name='font-text')
-        box.append(icon)
-        box.append(self._font_label)
-        self.set_child(bt)
+        box.pack_start(icon, False, False, 0)
+        box.pack_start(self._font_label, False, False, 0)
+        self.add(bt)
         self.set_visible(True)
 
         self._font_name = 'Sans'
@@ -224,29 +224,29 @@ class FontSize(Gtk.ToolItem):
 
         hbox = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL)
         vbox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        self.set_child(vbox)
+        self.add(vbox)
         # add a vbox to set the padding up and down
-        vbox.append(hbox)
+        vbox.pack_start(hbox, False, False, 0)
         self._size_down = Gtk.Button()
         self._size_down.set_can_focus(False)
         icon = Icon(icon_name='resize-')
-        self._size_down.set_child(icon)
+        self._size_down.add(icon)
         self._size_down.connect('clicked', self.__font_sizes_cb, False)
-        hbox.append(self._size_down)
+        hbox.pack_start(self._size_down, False, False, 0)
 
         # TODO: default?
         self._default_size = 12
         self._font_size = self._default_size
 
         self._size_label = Gtk.Label(str(self._font_size))
-        hbox.append(self._size_label)
+        hbox.pack_start(self._size_label, False, False, 0)
 
         self._size_up = Gtk.Button()
         self._size_up.set_can_focus(False)
         icon = Icon(icon_name='resize+')
-        self._size_up.set_child(icon)
+        self._size_up.add(icon)
         self._size_up.connect('clicked', self.__font_sizes_cb, True)
-        hbox.append(self._size_up)
+        hbox.pack_start(self._size_up, False, False, 0)
 
         radius = 2 * subcell_size
         theme_up = b"button {border-radius:0px %dpx %dpx 0px;}" % (radius,

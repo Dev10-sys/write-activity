@@ -64,12 +64,19 @@ class ConnectingBox(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
         self.props.halign = Gtk.Align.CENTER
         self.props.valign = Gtk.Align.CENTER
+
         waiting_icon = Icon(icon_name='zoom-neighborhood',
                             pixel_size=style.STANDARD_ICON_SIZE)
         waiting_icon.set_xo_color(XoColor('white'))
-        self.append(waiting_icon)
-        self.append(Gtk.Label(_('Connecting...')))
-        self.set_visible(True)
+
+        self.pack_start(waiting_icon, False, False, 0)
+        waiting_icon.show()
+
+        label = Gtk.Label(_('Connecting...'))
+        self.pack_start(label, False, False, 0)
+        label.show()
+
+        self.show()
         self.hide()
 
 
@@ -165,7 +172,7 @@ class AbiWordActivity(activity.Activity):
 
         # add a overlay to be able to show a icon while joining a shared doc
         overlay = Gtk.Overlay()
-        overlay.set_child(self.abiword_canvas)
+        overlay.add(self.abiword_canvas)
 
 
         self._connecting_box = ConnectingBox()
