@@ -16,6 +16,7 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 from gi.repository import Gtk
+from gi.repository import Gdk
 from gi.repository import GObject
 
 from sugar3.graphics import style
@@ -46,14 +47,15 @@ class GridCreateWidget(Gtk.DrawingArea):
         self._update_size()
         self.connect("draw", self.__draw_cb)
 
-        click = Gtk.GestureClick()
-        click.connect('pressed', self.__pressed_cb)
-        click.connect('released', self.__released_cb)
-        self.add_controller(click)
+        self.add_events(
+            Gdk.EventMask.BUTTON_PRESS_MASK |
+            Gdk.EventMask.BUTTON_RELEASE_MASK |
+            Gdk.EventMask.POINTER_MOTION_MASK
+        )
 
-        motion = Gtk.EventControllerMotion()
-        motion.connect('motion', self.__motion_cb)
-        self.add_controller(motion)
+        self.connect("button-press-event", self.__pressed_cb)
+        self.connect("button-release-event", self.__released_cb)
+        self.connect("motion-notify-event", self.__motion_cb)
 
     def _update_cell_position(self, x, y):
         columns = int(x / self._cell_width) + 1
@@ -63,14 +65,14 @@ class GridCreateWidget(Gtk.DrawingArea):
             self._rows = rows
             self._update_size()
 
-    def __pressed_cb(self, gesture, n_press, x, y):
-        self._update_cell_position(x, y)
+    def __pressed_cb(self, widget, event):
+        self._update_cell_position(event.x, event.y)
 
-    def __released_cb(self, gesture, n_press, x, y):
+    def __released_cb(self, widget, event):
         self.emit('create-table', self._rows, self._columns)
 
-    def __motion_cb(self, controller, x, y):
-        self._update_cell_position(x, y)
+    def __motion_cb(self, widget, event):
+        self._update_cell_position(event.x, event.y)
 
     def _update_size(self):
         self._min_col = max(self._columns + 1, self._min_columns)
