@@ -37,7 +37,7 @@ class SpeechToolbar(Gtk.Box):
             button = ToolButton(icon)
             button.show()
             button.connect('clicked', callback)
-            self.append(button)
+            self.pack_start(button, False, False, 0)
             button.set_tooltip(tip)
             return button
 
@@ -71,7 +71,8 @@ class SpeechToolbar(Gtk.Box):
         if not self._speech.get_is_paused():
             abi = self._activity.abiword_canvas
             text = abi.get_content("text/plain", None)
-            self._speech.say_text(text[0])
+            if text and text[0]:
+                self._speech.say_text(text[0])
         else:
             self._speech.restart()
 
