@@ -204,7 +204,7 @@ class EditToolbar(Gtk.Box):
     # bad foddex! this function was copied from sugar's activity.py
     def _add_widget(self, widget, expand=False):
         tool_item = Gtk.Box()
-        tool_item.set_expand(expand)
+        tool_item.set_hexpand(expand)
 
         tool_item.add(widget)
         widget.show()
