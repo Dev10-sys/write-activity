@@ -33,18 +33,18 @@ from gi.repository import GObject
 
 from gi.repository import Gtk
 
-from sugar3.activity import activity
-from sugar3.activity.widgets import StopButton
-from sugar3.activity.widgets import ActivityToolbarButton
-from sugar3.activity.activity import get_bundle_path
+from sugar4.activity import activity
+from sugar4.activity.widgets import StopButton
+from sugar4.activity.widgets import ActivityToolbarButton
+from sugar4.activity.activity import get_bundle_path
 
-from sugar3.graphics.toolbutton import ToolButton
-from sugar3.graphics.toolbarbox import ToolbarButton, ToolbarBox
-from sugar3.graphics import style
-from sugar3.graphics.icon import Icon
-from sugar3.graphics.xocolor import XoColor
-from sugar3.graphics.palettemenu import PaletteMenuBox
-from sugar3.graphics.palettemenu import PaletteMenuItem
+from sugar4.graphics.toolbutton import ToolButton
+from sugar4.graphics.toolbarbox import ToolbarButton, ToolbarBox
+from sugar4.graphics import style
+from sugar4.graphics.icon import Icon
+from sugar4.graphics.xocolor import XoColor
+from sugar4.graphics.palettemenu import PaletteMenuBox
+from sugar4.graphics.palettemenu import PaletteMenuItem
 
 from toolbar import EditToolbar
 from toolbar import ViewToolbar
@@ -54,9 +54,9 @@ from toolbar import ParagraphToolbar
 from widgets import ExportButtonFactory
 from widgets import DocumentView
 from speechtoolbar import SpeechToolbar
-from sugar3.graphics.objectchooser import ObjectChooser
+from sugar4.graphics.objectchooser import ObjectChooser
 try:
-    from sugar3.graphics.objectchooser import FILTER_TYPE_GENERIC_MIME
+    from sugar4.graphics.objectchooser import FILTER_TYPE_GENERIC_MIME
 except:
     FILTER_TYPE_GENERIC_MIME = 'generic_mime'
 
@@ -459,7 +459,7 @@ class AbiWordActivity(activity.Activity):
         if mime_type in ['application/rtf', 'text/rtf', 'text/html']:
             return False
 
-        from sugar3 import mime
+        from sugar4 import mime
 
         mime_parents = mime.get_mime_parents(self.metadata['mime_type'])
         return self.metadata['mime_type'] in ['text/plain', 'text/csv'] or \
