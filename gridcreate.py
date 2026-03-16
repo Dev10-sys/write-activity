@@ -44,7 +44,7 @@ class GridCreateWidget(Gtk.DrawingArea):
         self.props.margin_end = style.DEFAULT_SPACING
 
         self._update_size()
-        self.set_draw_func(self.__draw_cb)
+        self.connect("draw", self.__draw_cb)
 
         click = Gtk.GestureClick()
         click.connect('pressed', self.__pressed_cb)
@@ -82,7 +82,10 @@ class GridCreateWidget(Gtk.DrawingArea):
                               self._height + style.LINE_WIDTH)
         self.queue_draw()
 
-    def __draw_cb(self, widget, cr, width, height):
+    def __draw_cb(self, widget, cr):
+        alloc = widget.get_allocation()
+        width = alloc.width
+        height = alloc.height
         # background
         cr.set_source_rgba(*style.COLOR_BLACK.get_rgba())
         cr.rectangle(0, 0, self._width, self._height)
