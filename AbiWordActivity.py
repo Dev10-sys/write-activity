@@ -114,7 +114,9 @@ class AbiWordActivity(activity.Activity):
         self.speech_toolbar_button.set_page(self.speech_toolbar)
         self.speech_toolbar_button.show()
 
-        separator = Gtk.Separator()
+        separator = Gtk.SeparatorToolItem()
+        separator.set_draw(False)
+        separator.show()
         toolbar_box.toolbar.insert(separator, -1)
 
         text_toolbar = ToolbarButton()
@@ -149,9 +151,10 @@ class AbiWordActivity(activity.Activity):
         box.append_item(menu_item)
         menu_item.show()
 
-        separator = Gtk.Separator()
-        separator.set_hexpand(True)
-        separator.set_visible(True)
+        separator = Gtk.SeparatorToolItem()
+        separator.set_draw(False)
+        separator.set_expand(True)
+        separator.show()
         toolbar_box.toolbar.insert(separator, -1)
 
         stop = StopButton(self)
