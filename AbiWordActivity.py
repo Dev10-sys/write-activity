@@ -20,16 +20,18 @@ from gettext import gettext as _
 import logging
 import os
 
+import gi
+gi.require_version('Gtk', '4.0')
+try:
+    gi.require_version('TelepathyGLib', '0.12')
+    from gi.repository import TelepathyGLib
+except Exception:
+    TelepathyGLib = None
+
 # Abiword needs this to happen as soon as possible
 from gi.repository import GObject
-GObject.threads_init()
-
-import gi
-gi.require_version('Gtk', '3.0')
-gi.require_version('TelepathyGLib', '0.12')
 
 from gi.repository import Gtk
-from gi.repository import TelepathyGLib
 
 from sugar3.activity import activity
 from sugar3.activity.widgets import StopButton
@@ -61,18 +63,18 @@ except:
 logger = logging.getLogger('write-activity')
 
 
-class ConnectingBox(Gtk.VBox):
+class ConnectingBox(Gtk.Box):
 
     def __init__(self):
-        Gtk.VBox.__init__(self)
+        Gtk.Box.__init__(self, orientation=Gtk.Orientation.VERTICAL)
         self.props.halign = Gtk.Align.CENTER
         self.props.valign = Gtk.Align.CENTER
         waiting_icon = Icon(icon_name='zoom-neighborhood',
                             pixel_size=style.STANDARD_ICON_SIZE)
         waiting_icon.set_xo_color(XoColor('white'))
-        self.add(waiting_icon)
-        self.add(Gtk.Label(_('Connecting...')))
-        self.show_all()
+        self.append(waiting_icon)
+        self.append(Gtk.Label(_('Connecting...')))
+        self.show()
         self.hide()
 
 
@@ -92,9 +94,7 @@ class AbiWordActivity(activity.Activity):
         self.activity_button = ActivityToolbarButton(self)
         toolbar_box.toolbar.insert(self.activity_button, -1)
 
-        separator = Gtk.SeparatorToolItem()
-        separator.show()
-        self.activity_button.props.page.insert(separator, 2)
+        # GTK4 migration TODO
         ExportButtonFactory(self, self.abiword_canvas)
         self.activity_button.show()
 
@@ -116,8 +116,7 @@ class AbiWordActivity(activity.Activity):
         self.speech_toolbar_button.set_page(self.speech_toolbar)
         self.speech_toolbar_button.show()
 
-        separator = Gtk.SeparatorToolItem()
-        toolbar_box.toolbar.insert(separator, -1)
+        # GTK4 migration TODO
 
         text_toolbar = ToolbarButton()
         text_toolbar.props.page = TextToolbar(self.abiword_canvas)
@@ -151,22 +150,17 @@ class AbiWordActivity(activity.Activity):
         box.append_item(menu_item)
         menu_item.show()
 
-        separator = Gtk.SeparatorToolItem()
-        separator.props.draw = False
-        separator.set_size_request(0, -1)
-        separator.set_expand(True)
-        separator.show()
-        toolbar_box.toolbar.insert(separator, -1)
+        # GTK4 migration TODO
 
         stop = StopButton(self)
         toolbar_box.toolbar.insert(stop, -1)
 
-        toolbar_box.show_all()
+        toolbar_box.show()
         self.set_toolbar_box(toolbar_box)
 
         # add a overlay to be able to show a icon while joining a shared doc
         overlay = Gtk.Overlay()
-        overlay.add(self.abiword_canvas)
+        overlay.set_child(self.abiword_canvas)
         overlay.show()
 
         self._connecting_box = ConnectingBox()
@@ -260,6 +254,9 @@ class AbiWordActivity(activity.Activity):
         return preview_data
 
     def _shared_cb(self, activity):
+        if TelepathyGLib is None:
+            logger.warning("TelepathyGLib not available, collaboration disabled")
+            return
         logger.debug('My Write activity was shared')
         self._sharing_setup()
 
@@ -272,6 +269,9 @@ class AbiWordActivity(activity.Activity):
         logger.debug('Tube address: %s', channel.GetDBusTubeAddress(id))
 
     def _sharing_setup(self):
+        if TelepathyGLib is None:
+            logger.warning("TelepathyGLib not available, collaboration disabled")
+            return
         logger.debug("_sharing_setup()")
 
         if self.shared_activity is None:
@@ -294,6 +294,9 @@ class AbiWordActivity(activity.Activity):
         logger.error('ListTubes() failed: %s', e)
 
     def _joined_cb(self, activity):
+        if TelepathyGLib is None:
+            logger.warning("TelepathyGLib not available, collaboration disabled")
+            return
         logger.debug("_joined_cb()")
         if not self.shared_activity:
             self._enable_collaboration()
@@ -319,6 +322,9 @@ class AbiWordActivity(activity.Activity):
         self._connecting_box.hide()
 
     def _new_tube_cb(self, id, initiator, type, service, params, state):
+        if TelepathyGLib is None:
+            logger.warning("TelepathyGLib not available, collaboration disabled")
+            return
         logger.debug('New tube: ID=%d initiator=%d type=%d service=%s '
                      'params=%r state=%d', id, initiator, type, service,
                      params, state)
